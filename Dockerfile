@@ -86,7 +86,9 @@ RUN set -eux; \
 
 COPY .env ./.env
 COPY config ./config
-COPY web/app ./web/app
+COPY web/app/plugins ./web/app/plugins
+COPY web/app/themes ./web/app/themes
+COPY web/app/mu-plugins ./web/app/mu-plugins
 COPY web/index.php ./web
 COPY web/wp-config.php ./web
 

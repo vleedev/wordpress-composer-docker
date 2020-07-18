@@ -15,7 +15,10 @@ services:
     image: ${PHP_IMAGE:-wordpress/php}
     volumes:
       - ./config:/srv/app/config
-      - ./web:/srv/app/web
+      - ./web/app/plugins:/srv/app/web/app/plugins
+      - ./web/app/themes:/srv/app/web/app/themes
+      - ./web/app/mu-plugins:/srv/app/web/app/mu-plugins
+      - ./web/app/uploads:/srv/app/web/app/uploads
       - ./.env:/srv/app/.env
       - ./composer.json:/srv/app/composer.json
       - ./composer.lock:/srv/app/composer.lock
@@ -30,10 +33,10 @@ services:
     image: ${NGINX_IMAGE:-wordpress/nginx}
     volumes:
       - ./config:/srv/app/config
-      - ./web:/srv/app/web
-      - ./.env:/srv/app/.env
-      - ./composer.json:/srv/app/composer.json
-      - ./composer.lock:/srv/app/composer.lock
+      - ./web/app/plugins:/srv/app/web/app/plugins
+      - ./web/app/themes:/srv/app/web/app/themes
+      - ./web/app/mu-plugins:/srv/app/web/app/mu-plugins
+      - ./web/app/uploads:/srv/app/web/app/uploads
     depends_on:
       - php
     ports:
