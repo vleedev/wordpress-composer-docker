@@ -1,0 +1,64 @@
+version: '3.7'
+
+x-cache-from:
+  - &api-cache-from
+    cache_from:
+      - ${NGINX_IMAGE:-wordpress/nginx}
+      - ${PHP_IMAGE:-wordpress/php}
+
+services:
+  php:
+    build:
+      context: .
+      target: wordpress_php_fpm
+      <<: *api-cache-from
+    image: ${PHP_IMAGE:-wordpress/php}
+    volumes:
+      - ./config:/srv/app/config
+      - ./web:/srv/app/web
+      - ./.env:/srv/app/.env
+      - ./composer.json:/srv/app/composer.json
+      - ./composer.lock:/srv/app/composer.lock
+    depends_on:
+      - db
+
+  webserver:
+    build:
+      context: .
+      target: wordpress_nginx
+      <<: *api-cache-from
+    image: ${NGINX_IMAGE:-wordpress/nginx}
+    volumes:
+      - ./config:/srv/app/config
+      - ./web:/srv/app/web
+      - ./.env:/srv/app/.env
+      - ./composer.json:/srv/app/composer.json
+      - ./composer.lock:/srv/app/composer.lock
+    depends_on:
+      - php
+    ports:
+      - 8443:443
+
+  db:
+    image: mariadb:10.4.12
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_PASSWORD=!wordpress!
+      - MYSQL_USER=wordpress
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql:rw
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=wordpress
+      - PMA_PASSWORD=!wordpress!
+    ports:
+      - 8444:80
+volumes:
+  db-data: {}
